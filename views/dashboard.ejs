@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trap: <%= trap.name %> - Lobster Trap</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1><a href="/">🦞 Lobster Trap</a></h1>
+      <span class="tagline">Catch & inspect HTTP requests</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="dash-header">
+      <h2>🪤 <%= trap.name %></h2>
+      <p style="color: var(--text-dim); font-size: 0.85rem;">Created: <%= trap.created_at %></p>
+    </div>
+
+    <div class="endpoint-box">
+      <div>
+        <div style="color: var(--text-dim); font-size: 0.75rem; margin-bottom: 4px;">TRAP ENDPOINT</div>
+        <span class="endpoint-url" id="endpoint-url"><%= baseUrl %>/t/<%= trap.id %></span>
+      </div>
+      <button class="btn btn-sm" onclick="copyUrl()">Copy</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-sm btn-outline" onclick="refreshPage()">Refresh</button>
+      <button class="btn btn-sm btn-outline" onclick="deleteTrap()">Delete Trap</button>
+    </div>
+
+    <div class="request-list">
+      <h3>Caught Requests (<%= requests.length %>)</h3>
+
+      <% if (requests.length === 0) { %>
+        <div class="empty-state">
+          <div class="icon">🌊</div>
+          <p>No requests caught yet.</p>
+          <p style="margin-top: 8px; font-size: 0.85rem;">Send a request to the endpoint above to see it here.</p>
+          <pre style="margin-top: 16px; display: inline-block; text-align: left; background: var(--bg); border: 1px solid var(--border); padding: 12px 16px; border-radius: 6px; font-size: 0.8rem;">curl -X POST <%= baseUrl %>/t/<%= trap.id %> \
+  -H "Content-Type: application/json" \
+  -d '{"hello": "lobster"}'</pre>
+        </div>
+      <% } %>
+
+      <% requests.forEach((req, i) => { %>
+        <div class="request-item">
+          <div class="request-summary" onclick="toggle(<%= i %>)">
+            <span class="method-badge method-<%= req.method %>"><%= req.method %></span>
+            <span style="font-family: monospace; font-size: 0.85rem; color: var(--text-dim);"><%= req.path %></span>
+            <span class="ip"><%= req.ip %></span>
+            <span class="time"><%= req.created_at %></span>
+          </div>
+          <div class="request-details" id="detail-<%= i %>">
+            <% if (req.query && req.query !== '{}') { %>
+            <div class="detail-section">
+              <h4>Query Parameters</h4>
+              <pre><%= JSON.stringify(JSON.parse(req.query), null, 2) %></pre>
+            </div>
+            <% } %>
+
+            <div class="detail-section">
+              <h4>Headers</h4>
+              <pre><%= JSON.stringify(JSON.parse(req.headers || '{}'), null, 2) %></pre>
+            </div>
+
+            <% if (req.body && req.body.trim()) { %>
+            <div class="detail-section">
+              <h4>Body</h4>
+              <pre><% try { %><%= JSON.stringify(JSON.parse(req.body), null, 2) %><% } catch(e) { %><%= req.body %><% } %></pre>
+            </div>
+            <% } %>
+
+            <div class="detail-section">
+              <h4>Meta</h4>
+              <pre>Content-Type: <%= req.content_type || 'N/A' %>
+IP: <%= req.ip %>
+Time: <%= req.created_at %></pre>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <footer>
+    <p>🦞 Lobster Trap &mdash; Like RequestBin, but with more claws.</p>
+  </footer>
+
+  <script>
+    function toggle(i) {
+      const el = document.getElementById('detail-' + i);
+      el.classList.toggle('open');
+    }
+
+    function copyUrl() {
+      const url = document.getElementById('endpoint-url').textContent;
+      navigator.clipboard.writeText(url).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      });
+    }
+
+    function refreshPage() {
+      location.reload();
+    }
+
+    function deleteTrap() {
+      if (!confirm('Delete this trap and all its caught requests?')) return;
+      fetch(location.pathname, { method: 'DELETE' })
+        .then(() => location.href = '/');
+    }
+  </script>
+</body>
+</html>

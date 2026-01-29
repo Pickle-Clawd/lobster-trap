@@ -1,0 +1,17 @@
+{
+  "name": "lobster-trap",
+  "version": "1.0.0",
+  "description": "A self-hosted webhook inspection and testing tool with a lobster theme",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["webhook", "inspection", "http", "testing", "requestbin"],
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "better-sqlite3": "^11.6.0",
+    "uuid": "^10.0.0"
+  }
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lobster Trap - Webhook Inspector</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1><a href="/">🦞 Lobster Trap</a></h1>
+      <span class="tagline">Catch & inspect HTTP requests</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="hero">
+      <div class="lobster-icon">🪤</div>
+      <h2>Set Your Trap</h2>
+      <p>Create a unique endpoint URL that captures incoming HTTP requests. Inspect headers, body, query params, and more.</p>
+    </div>
+
+    <div class="create-section">
+      <form action="/traps" method="POST" class="create-form">
+        <input type="text" name="name" placeholder="Name your trap (optional)">
+        <button type="submit" class="btn">Create Trap 🦞</button>
+      </form>
+    </div>
+
+    <% if (traps.length > 0) { %>
+    <div class="trap-list">
+      <h3>Recent Traps</h3>
+      <% traps.forEach(trap => { %>
+        <div class="trap-card">
+          <div>
+            <a href="/traps/<%= trap.id %>"><%= trap.name || trap.id %></a>
+            <div class="meta"><%= trap.created_at %></div>
+          </div>
+          <span class="badge"><%= counts[trap.id] || 0 %> caught</span>
+        </div>
+      <% }) %>
+    </div>
+    <% } else { %>
+    <div class="no-traps">
+      <p>No traps yet. Create one above to get started!</p>
+    </div>
+    <% } %>
+  </div>
+
+  <footer>
+    <p>🦞 Lobster Trap &mdash; Like RequestBin, but with more claws.</p>
+  </footer>
+</body>
+</html>
