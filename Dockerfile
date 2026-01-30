@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --production
 COPY . .
+RUN mkdir -p /data
 ENV DB_PATH=/data/lobster-trap.db
 EXPOSE 3000
 CMD ["node", "index.js"]
